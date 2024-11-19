@@ -112,15 +112,15 @@ pais_seleccionado = st.sidebar.selectbox(
 )
 
 # Lista de selección de continentes
-lista_continentes = datos['Continente'].unique().tolist()
-lista_continentes.sort()
+# lista_continentes = datos['Continente'].unique().tolist()
+# lista_continentes.sort()
 
-opciones_continentes = ['Todos'] + lista_continentes
+# opciones_continentes = ['Todos'] + lista_continentes
 
-continente_seleccionado = st.sidebar.selectbox(
-    'Seleccione un continente',
-    opciones_continentes
-)
+# continente_seleccionado = st.sidebar.selectbox(
+#     'Seleccione un continente',
+#     opciones_continentes
+# )
 
 
 # ----- Filtrar datos según la selección -----
@@ -173,6 +173,36 @@ st.subheader('Casos totales a lo largo del tiempo')
 st.plotly_chart(fig_casos)
 
 
+# ----- Gráfico de muertes totales a lo largo del tiempo -----
+
+# Agrupar por fecha y sumar las muertes totales
+muertes_totales_por_fecha = (
+    datos_filtrados
+    .groupby('Fecha')['Muertes totales']
+    .sum()
+    .reset_index()
+)
+
+# Crear el gráfico de líneas para muertes totales
+fig_casos = px.line(
+    muertes_totales_por_fecha, 
+    x='Fecha', 
+    y='Muertes totales', 
+    title='Muertes totales a lo largo del tiempo',
+    labels={'Muertes totales': 'Cantidad de muertes totales', 'Fecha': 'Fecha'}
+)
+
+# Ajustar el formato del eje x para mostrar la fecha completa
+fig_casos.update_xaxes(
+    tickformat="%Y-%m-%d",  # Formato de año-mes-día
+    title_text="Fecha"
+)
+
+# Mostrar el gráfico
+st.subheader('Muertes totales a lo largo del tiempo')
+st.plotly_chart(fig_casos)
+
+
 # ----- Mapa de coropletas con folium -----
 
 # Agrupar los casos totales por país (última fecha disponible o filtrados)
@@ -216,7 +246,7 @@ if pais_seleccionado != 'Todos':
     else:
         # Valores por defecto si no se encuentra el país
         coordenadas = [0, 0]
-        zoom_level = 2
+        zoom_level = 1
 else:
     coordenadas = [0, 0]
     zoom_level = 1
